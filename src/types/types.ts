@@ -38,11 +38,13 @@ export type UserLoginProps = {
 export type ClassCreateProps = {      
  title: string;       
  slug: string;  
+ schoolId: string;
 };
 
 export type DepartmentCreateProps = {      
  name: string;       
  slug: string;  
+ schoolId: string;
 };
 
 export type SubjectCreateProps = {      
@@ -59,7 +61,8 @@ export type SubjectCreateProps = {
 export type StreamCreateProps = {     
  title: string;       
  slug: string;        
- classId: string;     
+ classId: string; 
+ schoolId: string;   
 };
 
 export type ParentCreateProps = {
@@ -79,6 +82,8 @@ export type ParentCreateProps = {
  imageUrl: string;
  occupation: string;
  address: string;
+ schoolId: string;
+ userId: string;
 };
 
 export type StudentCreateProps = {
@@ -106,7 +111,8 @@ export type StudentCreateProps = {
  admissionDate: string;
  extraInfo: string;
  bloodGroup: string;
-
+ schoolId: string;
+ userId: string;
 };
 
 export type TeacherCreateProps = {
@@ -135,4 +141,6 @@ export type TeacherCreateProps = {
  experience: number;
  address: string;
  imageUrl: string;
+ schoolId: string;
+ userId: string;
 };
