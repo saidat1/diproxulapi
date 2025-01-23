@@ -19,4 +19,382 @@ model School {
   slug String @unique
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  // add relations
+  students  Student[]
+  classes   Class[]
+  parents   Parent[]
+  streams   Stream[]
+  teachers Teacher[]
+  departments Department[]
+
+}
+
+model Contact {
+  id        String      @id @default(cuid())
+  fullName  String
+  email     String   @unique
+  phone     String
+  school    String   @unique
+  country   String
+  schoolPage String
+  students  Int
+  role      String
+  media     String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contacts")
+}
+
+model Class {
+  id    String     @id @default(cuid())
+  title String
+  slug  String  @unique
+  streams Stream[] // One-to-many relationship (Class has many Streams)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //relations
+  students  Student[]
+  schoolId  String
+  school    School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("classes")
+}
+
+model Stream {
+  id      String    @id @default(cuid())
+  title   String
+  slug    String @unique
+  classId String    // Foreign key to Class
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //relations
+  students  Student[]
+  schoolId  String
+  school    School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("streams")
+}
+
+model Parent {
+  id             String @id @default(cuid())
+  title          String
+  firstName      String
+  lastName       String
+  relationship   String
+  email          String @unique
+  NIN            String @unique
+  gender         String
+  dob            DateTime
+  phone          String @unique
+  nationality    String
+  whatsapNo      String?
+  password       String
+  contactMethod  String
+  imageUrl       String?
+  occupation     String
+  address        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // one to one relationship with User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique // Foreign key to User
+
+  //relations
+  students  Student[]
+  schoolId  String
+  school    School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  
+
+  @@map("parents")
+}
+
+model Student {
+  id            String   @id @default(cuid())  // Unique ID for each student
+  name          String
+  firstName     String
+  lastName      String
+  email         String   @unique
+  parentId      String
+  classId       String
+  studentType   String? @default("PS")
+  streamId      String
+  parentName    String?
+  classTitle    String?
+  streamTitle   String?
+  password      String
+  healthStatus  String
+  BCN           String   @unique
+  imageUrl      String?
+  phone         String?
+  nationality   String
+  religion      String
+  gender        String
+  dob           DateTime
+  regNo         String   @unique
+  address       String
+  admissionDate DateTime
+  extraInfo     String
+  bloodGroup    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // one to one relationship with User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique // Foreign key to User
+
+  // Relations
+  parent        Parent   @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  class         Class    @relation(fields: [classId], references: [id])
+  stream        Stream   @relation(fields: [streamId], references: [id])
+  schoolId  String
+  school    School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("students")
+}
+
+model Teacher {
+  id        String      @id @default(cuid())   // Unique identifier for the teacher
+  title     String      // Teacher's title (e.g., Mr, Mrs, Dr)
+  firstName String   // Teacher's first name
+  lastName  String   // Teacher's last name
+  contactMethod String // Teacher's preferred contact method (e.g., Email, Phone, WhatsApp)
+  email     String   @unique  // Teacher's unique email address
+  phone     String  @unique // Optional: Teacher's phone number
+  whatsappNo String? // Optional: Teacher's WhatsApp number
+  dateOfBirth DateTime? // Optional: Teacher's date of birth
+  gender    Gender
+  imageUrl  String?  // Optional: URL to the teacher's profile picture
+  NIN       String  @unique // Teacher's National Identification Number
+  password  String?  // Optional: Teacher's password
+  isActive  Boolean  @default(true) // Whether the teacher is currently active
+  lastLogin DateTime? // Optional: Last time the teacher logged in
+  dateOfJoining DateTime // Date when the teacher joined the school
+  designation String // Teacher's designation (e.g., Principal, Vice Principal, Teacher)
+  departmentName String // Optional: Department where the teacher works (e.g., Science, Math)
+  mainSubject String? // Optional: Teacher's specialization (e.g., Physics, Chemistry)
+  mainSubjectId String? // Optional: Teacher's specialization ID
+  qualification String // Teacher's qualification (e.g., B.Sc, M.Sc, B.Ed)
+  subjects String[] // One-to-many relationship (Teacher has many Subjects)
+  classes String[] // One-to-many relationship (Teacher has many Classes)
+  classIds String[] // One-to-many relationship (Teacher has many Class IDs)
+  documents TeacherDocument[] // One-to-many relationship (Teacher has many Documents)
+  address String? // Optional: Teacher's address
+  nationality String? // Optional: Teacher's nationality
+  emergencyContactPhone String? // Optional: Teacher's emergency contact number
+  emergencyContactName String? // Optional: Teacher's emergency contact name
+  emergencyContactRelation String? // Optional: Teacher's emergency contact relationship 
+  experience Int? // Optional: Teacher's experience in years 
+  bio String? @db.Text // Optional: Teacher's bio
+  skills String? // Optional: Teacher's skills
+
+  // one to one relationship with User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique // Foreign key to User
+
+  schoolId String // Foreign key to School
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  departmentId String? // Foreign key to Department
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  attendance TeacherAttendance[] // One-to-many relationship (Teacher has many Attendances)
+  leave TeacherLeave[] // One-to-many relationship (Teacher has many Leaves)
+
+  createdAt DateTime @default(now()) // Automatically set when the record is created
+  updatedAt DateTime @updatedAt // Automatically updated when the record is modified
+
+  @@map("teachers")
+}
+model Department {
+  id        String @id @default(cuid()) // Unique identifier for the department
+  name      String // Name of the department (e.g., Science, Math)
+  slug      String @unique // Unique slug for the department
+  schoolId String // Foreign key to School
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  hodId String? // Optional: Head of the department
+  hodName String? // Optional: Head of the department name
+  hodStartDate DateTime? // One-to-many relationship (Department has many Teachers)
+
+  teachers Teacher[] // One-to-many relationship (Department has many Teachers)
+  subjects Subject[] // One-to-many relationship (Department has many Subjects)
+  budjet Float? // Optional: Department's budget
+  budjetYear String? // Optional: Budget year
+  createdAt DateTime @default(now()) // Automatically set when the record is created
+  updatedAt DateTime @updatedAt // Automatically updated when the record is modified
+
+  @@map("departments")
+}
+
+model TeacherDocument {
+  id        String @id @default(cuid()) // Unique identifier for the teacher document
+  teacher Teacher @relation(fields: [teacherId], references: [id]) // Many-to-one relationship (TeacherDocument belongs to Teacher)
+  teacherId String // Foreign key to Teacher
+  type DocumentType // Type of document (e.g., Resume, ID Proof, Address Proof)
+  title String // Title of the document
+  url String // URL to the document
+  uploadedAt DateTime @default(now()) // Automatically updated when the record is modified
+
+  @@index([teacherId])
+  @@map("teacherDocuments")
+}
+
+model Subject {
+  id        String @id @default(cuid()) // Unique identifier for the subject
+  name      String // Name of the subject (e.g., Math, Science)
+  slug      String @unique // Unique slug for the subject
+  code      String // Code for the subject (e.g., MATH101, SCIENCE202)
+  shortName String? // Optional: Short name of the subject (e.g., Math, Sci)
+  category SubjectCategory // Category of the subject (e.g., Core, Elective, Additional)
+  type SubjectType // Type of the subject (e.g., Theory, Practical, Project)
+  passingMarks Int? // Optional: Passing marks for the subject
+  totalMarks Int? // Optional: Total marks for the subject
+  // schoolId String // Foreign key to School
+  // school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  departmentName String
+  departmentId String // Foreign key to Department
+  department Department @relation(fields: [departmentId], references: [id])
+  createdAt DateTime @default(now()) // Automatically set when the record is created
+  updatedAt DateTime @updatedAt // Automatically updated when the record is modified
+
+  isActive Boolean @default(true) // Whether the subject is currently active
+  isOptional Boolean @default(false) // Whether the subject is optional
+  hasPractical Boolean @default(false) // Whether the subject has a practical component
+  hasTheory Boolean @default(true) // Whether the subject has a theory component
+  // hasProject Boolean @default(false) // Whether the subject has a project component
+  // hasAssignment Boolean @default(false) // Whether the subject has an assignment component
+  // hasResearch Boolean @default(false) // Whether the subject has a research component
+  labRequired Boolean @default(false) // Whether the subject requires a lab
+
+  @@map("subjects")
+}
+
+model TeacherAttendance {
+  id        String @id @default(cuid()) // Unique identifier for the teacher attendance
+  teacher Teacher @relation(fields: [teacherId], references: [id]) // Many-to-one relationship (TeacherAttendance belongs to Teacher)
+  teacherId String // Foreign key to Teacher
+  date      DateTime // Date of the attendance
+  status    AttendanceStatus // Status of the attendance (e.g., Present, Absent, Late)
+  note   String? // Optional: note for the attendance
+  checkedIn DateTime? @default(now()) // Automatically set when the record is created
+  checkedOut DateTime? @updatedAt // Automatically updated when the record is modified
+
+  @@unique([teacherId, date])
+  @@map("teacherAttendances")
+}
+
+model TeacherLeave {
+  id        String @id @default(cuid()) // Unique identifier for the teacher leave
+  teacher Teacher @relation(fields: [teacherId], references: [id]) // Many-to-one relationship (TeacherLeave belongs to Teacher)
+  teacherId String // Foreign key to Teacher
+  startDate DateTime // Start date of the leave
+  endDate   DateTime // End date of the leave
+  type      LeaveType // Type of leave (e.g., Sick, Casual, Vacation)
+  status    LeaveStatus @default(PENDING) // Status of the leave (e.g., Pending, Approved, Rejected)
+  reason   String //  Remarks for the leave
+  approvedBy String? //  Remarks for the leave
+  approvedAt DateTime? // Optional: Date when the leave was approved
+
+  @@index([teacherId])
+  @@map("teacherLeaves")
+}
+  
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  password    String
+  role        UserRole   // Could be 'admin', 'teacher', 'student', 'parent', etc.
+  name        String
+  phone       String?
+  image       String?
+  schoolId    String?
+  schoolName  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  refreshToken RefreshToken[] // One-to-many relationship with RefreshToken
+  teacher     Teacher? // One-to-one relationship with Teacher
+  student     Student? // One-to-one relationship with Student
+  parent      Parent? // One-to-one relationship with Parent
+
+  @@map("users") 
+}
+
+model RefreshToken {
+  id        String @id @default(cuid())
+  token     String @unique
+  userId    String
+  user      User @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  revoked   Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("refreshTokens")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+enum DocumentType {
+  RESUME
+  CERTIFICATE
+  ID_PROOF
+  QUALIFICATION
+  CONTRACT
+  OTHER
+  ADDRESS_PROOF
+}
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  HALF_DAY
+  ON_LEAVE
+}
+enum LeaveType {
+  SICK
+  CASUAL
+  VACATION
+  MATERNITY
+  PATERNITY
+  UNPAID
+  OTHER
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum SubjectCategory {
+  CORE
+  ELECTIVE
+  ADDITIONAL
+  VOCATIONAL
+  LANGUAGE
+  EXTRA_CURRICULAR
+}
+
+enum SubjectType {
+  THEORY
+  PRACTICAL
+  BOTH
 }
