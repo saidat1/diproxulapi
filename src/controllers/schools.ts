@@ -28,8 +28,9 @@ export async function createSchool(req: Request, res: Response) {
     console.log(
       `School created successfully: ${newSchool.name} (${newSchool.id})`
     );
+    const {createdAt, updatedAt, ...others} = newSchool
     return res.status(201).json({
-      data: newSchool,
+      data: others,
       error: null,
     });
   } catch (error) {
@@ -52,16 +53,32 @@ export async function getSchools(req: Request, res: Response) {
     console.log(error);
   }
 }
-// export async function getCustomerById(req: Request, res: Response) {
-//   const { id } = req.params;
-//   try {
-//     const customer = await db.customer.findUnique({
-//       where: {
-//         id,
-//       },
-//     });
-//     return res.status(200).json(customer);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
+
+export async function getSchoolById(req: Request, res: Response) {
+  const { id } = req.params;
+  try {
+    const school = await db.school.findUnique({
+      where: {
+        id,},
+        select: {
+          id: true,
+          name: true,
+          logo: true ,
+          slug: true
+        }
+    });
+    if (!school) {
+      return res.status(404).json({
+        data: null,
+        error: "School not found",
+      });
+    }
+    return res.status(200).json(school);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      data: null,
+      error: "Something went wrong",
+    });
+  }
+}
