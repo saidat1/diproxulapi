@@ -4,6 +4,6 @@ const schoolRouter = express.Router();
 
 schoolRouter.post("/schools", createSchool);
 schoolRouter.get("/schools", getSchools);
-schoolRouter.get("/schools:id", getSchoolById);
+schoolRouter.get("/schools/:id", getSchoolById);
 
 export default schoolRouter;
