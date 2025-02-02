@@ -1,6 +1,6 @@
 import { db } from "@/db/db";
 import { TypedRequestBody, UserCreateProps, UserLoginProps } from "@/types/types";
-import { Response } from "express";
+import { Request, Response } from "express";
 import bcrypt from "bcrypt"
 import { generateAccessToken, generateRefreshToken, TokenPayload } from "@/utils/tokens";
 import { error } from "console";
@@ -119,7 +119,7 @@ export async function getAllUsers(req: Request, res: Response) {
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      error: "Failed to fetch Subjects",
+      error: "Failed to fetch Users",
     });
   }
 }
